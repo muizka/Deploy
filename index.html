@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>MUIZ FAST DEPLOY | PREMIUM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-color: #050505;
+      --accent-color: #ff0033; 
+      --success-color: #00ff88;
+      --text-main: #ffffff;
+      --card-inner: #0d0d0f;
+    }
+
+    body {
+      margin: 0; font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-color); color: var(--text-main);
+      display: flex; justify-content: center; align-items: center; min-height: 100vh;
+      background-image: radial-gradient(circle at 50% 0%, #1a1a2e, #000 75%);
+    }
+
+    .card-wrapper { width: 100%; max-width: 420px; padding: 1px; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.1), var(--accent-color), #000); }
+    .main-card { background: var(--card-inner); border-radius: 23px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+
+    .header { text-align: center; margin-bottom: 25px; }
+    .header h2 { margin: 0; font-size: 24px; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .lock-section {
+      background: rgba(255,255,255,0.03);
+      padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;
+    }
+    .task-btn {
+      width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 8px;
+      cursor: pointer; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;
+    }
+    .btn-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; }
+    .btn-tk { background: #000; border: 1px solid #fff; color: white; }
+    .task-btn.done { background: var(--success-color) !important; color: #000; }
+
+    .input-box {
+      background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);
+      padding: 12px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-top: 10px;
+    }
+    .input-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 13px; }
+
+    .btn-deploy {
+      width: 100%; padding: 16px; margin-top: 20px; border: none; border-radius: 12px;
+      background: #222; color: #555; font-weight: 700; cursor: not-allowed; transition: all 0.3s;
+    }
+    .btn-deploy.unlocked { background: var(--accent-color); color: white; cursor: pointer; box-shadow: 0 0 20px rgba(255,0,51,0.4); }
+
+    .result-box { margin-top: 20px; display: none; flex-direction: column; gap: 10px; }
+    .result-url { font-family: 'JetBrains Mono'; font-size: 11px; color: var(--success-color); background: #000; padding: 10px; border-radius: 8px; word-break: break-all; text-align: center; }
+  </style>
+</head>
+<body>
+
+<div class="card-wrapper">
+  <div class="main-card">
+    <div class="header">
+      <h2>MUIZ FAST DEPLOY</h2>
+      <p style="font-size: 11px; color: #666;">Selesaikan tugas untuk membuka fitur.</p>
+    </div>
+
+    <div class="lock-section">
+      <button class="task-btn btn-ig" onclick="doTask(this, 'ig', 'https://www.instagram.com/uz10987?igsh=enRieDB5N2dha210')">
+        <i class="fab fa-instagram"></i> Follow Instagram
+      </button>
+      <button class="task-btn btn-tk" onclick="doTask(this, 'tk', 'https://www.tiktok.com/@muiz5534?_r=1&_t=ZS-944I7SkjjyX')">
+        <i class="fab fa-tiktok"></i> Follow TikTok
+      </button>
+      
+      <div class="input-box">
+        <i class="fa-solid fa-key" style="color: gold;"></i>
+        <input type="text" id="licenseKey" placeholder="Masukkan License Key" oninput="validateAll()">
+      </div>
+    </div>
+
+    <form id="deployForm">
+      <div class="input-box">
+        <input type="text" id="siteName" placeholder="Nama Subdomain (cth: web-saya)" required>
+      </div>
+      <div class="input-box">
+        <input type="file" id="htmlFile" accept=".html" required>
+      </div>
+
+      <button type="submit" class="btn-deploy" id="deployBtn" disabled>
+        <i class="fa-solid fa-lock"></i> TERKUNCI
+      </button>
+    </form>
+
+    <div id="resultBox" class="result-box">
+      <div id="resultUrl" class="result-url"></div>
+      <button onclick="copyLink()" class="task-btn" style="background:#333; color:white;">
+        <i class="fa-regular fa-copy"></i> Copy Link
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // CONFIGURATION
+  const VALID_KEY = "MUIZ-2026"; 
+  const vercelToken = "vcp_6r9VRLQa2hcKuPUC7b1HoHexH0IvGCZBTxhw0UkvIgwowYBrPN2BpqlU";
+  let taskDone = { ig: false, tk: false };
+
+  // TASK LOGIC
+  function doTask(element, type, url) {
+    window.open(url, '_blank');
+    setTimeout(() => {
+      taskDone[type] = true;
+      element.classList.add('done');
+      element.innerHTML = `<i class="fa-solid fa-check"></i> Selesai`;
+      validateAll();
+    }, 2000);
+  }
+
+  // VALIDATION LOGIC
+  function validateAll() {
+    const keyInput = document.getElementById('licenseKey').value.trim();
+    const btn = document.getElementById('deployBtn');
+    
+    if (taskDone.ig && taskDone.tk && keyInput === VALID_KEY) {
+      btn.disabled = false;
+      btn.classList.add('unlocked');
+      btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Jalankan Deploy`;
+    } else {
+      btn.disabled = true;
+      btn.classList.remove('unlocked');
+      btn.innerHTML = `<i class="fa-solid fa-lock"></i> TERKUNCI`;
+    }
+  }
+
+  // DEPLOY LOGIC
+  document.getElementById("deployForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById("deployBtn");
+    const resBox = document.getElementById("resultBox");
+    const resUrl = document.getElementById("resultUrl");
+
+    const siteName = document.getElementById("siteName").value.trim().toLowerCase().replace(/\s+/g, '-');
+    const file = document.getElementById("htmlFile").files[0];
+
+    if (!file) return alert("Pilih file HTML dulu!");
+
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+    btn.disabled = true;
+
+    try {
+      // 1. Create/Check Project
+      await fetch("https://api.vercel.com/v9/projects", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${vercelToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ name: siteName })
+      });
+
+      // 2. Read File
+      const htmlText = await file.text();
+
+      // 3. Deploy
+      const deployRes = await fetch("https://api.vercel.com/v13/deployments", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${vercelToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: siteName,
+          projectSettings: { framework: null },
+          files: [{ file: "index.html", data: htmlText }]
+        })
+      });
+
+      const data = await deployRes.json();
+
+      if (data.url || data.readyState) {
+        resUrl.innerText = `https://${siteName}.vercel.app`;
+        resBox.style.display = "flex";
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Berhasil!`;
+      } else {
+        throw new Error(data.error?.message || "Terjadi kesalahan");
+      }
+    } catch (err) {
+      alert("Gagal Deploy: " + err.message);
+      btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Coba Lagi`;
+      btn.disabled = false;
+    }
+  });
+
+  function copyLink() {
+    const url = document.getElementById("resultUrl").innerText;
+    navigator.clipboard.writeText(url);
+    alert("Link berhasil disalin!");
+  }
+</script>
+
+</body>
+</html>
