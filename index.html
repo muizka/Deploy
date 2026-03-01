@@ -23,8 +23,8 @@
       background-image: radial-gradient(circle at 50% 0%, #1a1a2e, #000 75%);
     }
 
-    .card-wrapper { width: 100%; max-width: 420px; padding: 1px; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.1), var(--accent-color), #000); }
-    .main-card { background: var(--card-inner); border-radius: 23px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .card-wrapper { width: 95%; max-width: 420px; padding: 1px; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.1), var(--accent-color), #000); }
+    .main-card { background: var(--card-inner); border-radius: 23px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
 
     .header { text-align: center; margin-bottom: 25px; }
     .header h2 { margin: 0; font-size: 24px; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -34,18 +34,18 @@
       padding: 15px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px;
     }
     .task-btn {
-      width: 100%; padding: 10px; margin: 5px 0; border: none; border-radius: 8px;
-      cursor: pointer; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;
+      width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 10px;
+      cursor: pointer; font-weight: 600; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;
     }
     .btn-ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; }
     .btn-tk { background: #000; border: 1px solid #fff; color: white; }
-    .task-btn.done { background: var(--success-color) !important; color: #000; }
+    .task-btn.done { background: var(--success-color) !important; color: #000; border: none; }
 
     .input-box {
       background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08);
       padding: 12px; border-radius: 10px; display: flex; align-items: center; gap: 10px; margin-top: 10px;
     }
-    .input-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 13px; }
+    .input-box input { background: transparent; border: none; color: white; width: 100%; outline: none; font-size: 14px; }
 
     .btn-deploy {
       width: 100%; padding: 16px; margin-top: 20px; border: none; border-radius: 12px;
@@ -53,8 +53,8 @@
     }
     .btn-deploy.unlocked { background: var(--accent-color); color: white; cursor: pointer; box-shadow: 0 0 20px rgba(255,0,51,0.4); }
 
-    .result-box { margin-top: 20px; display: none; flex-direction: column; gap: 10px; }
-    .result-url { font-family: 'JetBrains Mono'; font-size: 11px; color: var(--success-color); background: #000; padding: 10px; border-radius: 8px; word-break: break-all; text-align: center; }
+    .result-box { margin-top: 20px; display: none; flex-direction: column; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+    .result-url { font-family: 'JetBrains Mono'; font-size: 12px; color: var(--success-color); background: #000; padding: 12px; border-radius: 8px; word-break: break-all; text-align: center; }
   </style>
 </head>
 <body>
@@ -63,7 +63,7 @@
   <div class="main-card">
     <div class="header">
       <h2>MUIZ FAST DEPLOY</h2>
-      <p style="font-size: 11px; color: #666;">Selesaikan tugas untuk membuka fitur.</p>
+      <p style="font-size: 11px; color: #888;">Selesaikan tugas & masukkan key untuk deploy.</p>
     </div>
 
     <div class="lock-section">
@@ -76,16 +76,18 @@
       
       <div class="input-box">
         <i class="fa-solid fa-key" style="color: gold;"></i>
-        <input type="text" id="licenseKey" placeholder="Masukkan License Key" oninput="validateAll()">
+        <input type="text" id="licenseKey" placeholder="License Key (MUIZ-2026)" oninput="validateAll()">
       </div>
     </div>
 
     <form id="deployForm">
       <div class="input-box">
-        <input type="text" id="siteName" placeholder="Nama Subdomain (cth: web-saya)" required>
+        <i class="fa-solid fa-globe"></i>
+        <input type="text" id="siteName" placeholder="Nama Website (contoh: muiz-web)" required>
       </div>
       <div class="input-box">
-        <input type="file" id="htmlFile" accept=".html" required>
+        <i class="fa-solid fa-file-code"></i>
+        <input type="file" id="htmlFile" accept=".html" required style="font-size: 11px;">
       </div>
 
       <button type="submit" class="btn-deploy" id="deployBtn" disabled>
@@ -94,21 +96,23 @@
     </form>
 
     <div id="resultBox" class="result-box">
-      <div id="resultUrl" class="result-url"></div>
+      <div id="resultUrl" class="result-url">Menunggu URL...</div>
       <button onclick="copyLink()" class="task-btn" style="background:#333; color:white;">
-        <i class="fa-regular fa-copy"></i> Copy Link
+        <i class="fa-regular fa-copy"></i> Salin Link
       </button>
     </div>
   </div>
 </div>
 
 <script>
-  // CONFIGURATION
+  // --- KONFIGURASI UTAMA ---
   const VALID_KEY = "MUIZ-2026"; 
-  const vercelToken = "vcp_6r9VRLQa2hcKuPUC7b1HoHexH0IvGCZBTxhw0UkvIgwowYBrPN2BpqlU";
+  // PENTING: Masukkan Access Token (bukan vcp_...) yang Anda dapat dari Vercel Settings > Tokens
+  const vercelToken = "PASTE_TOKEN_ANDA_DI_SINI"; 
+
   let taskDone = { ig: false, tk: false };
 
-  // TASK LOGIC
+  // FUNGSI TUGAS
   function doTask(element, type, url) {
     window.open(url, '_blank');
     setTimeout(() => {
@@ -116,10 +120,10 @@
       element.classList.add('done');
       element.innerHTML = `<i class="fa-solid fa-check"></i> Selesai`;
       validateAll();
-    }, 2000);
+    }, 3000); // 3 detik verifikasi
   }
 
-  // VALIDATION LOGIC
+  // FUNGSI VALIDASI
   function validateAll() {
     const keyInput = document.getElementById('licenseKey').value.trim();
     const btn = document.getElementById('deployBtn');
@@ -135,33 +139,34 @@
     }
   }
 
-  // DEPLOY LOGIC
+  // LOGIKA DEPLOY KE VERCEL
   document.getElementById("deployForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const btn = document.getElementById("deployBtn");
     const resBox = document.getElementById("resultBox");
     const resUrl = document.getElementById("resultUrl");
 
-    const siteName = document.getElementById("siteName").value.trim().toLowerCase().replace(/\s+/g, '-');
+    const siteName = document.getElementById("siteName").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '-');
     const file = document.getElementById("htmlFile").files[0];
 
-    if (!file) return alert("Pilih file HTML dulu!");
+    if (!file) return alert("Silakan pilih file HTML!");
+    if (vercelToken === "PASTE_TOKEN_ANDA_DI_SINI") return alert("Token belum diatur di dalam kode!");
 
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sedang Deploy...`;
     btn.disabled = true;
 
     try {
-      // 1. Create/Check Project
+      // 1. Buat Project Baru di Vercel
       await fetch("https://api.vercel.com/v9/projects", {
         method: "POST",
         headers: { "Authorization": `Bearer ${vercelToken}`, "Content-Type": "application/json" },
         body: JSON.stringify({ name: siteName })
       });
 
-      // 2. Read File
+      // 2. Baca isi file HTML yang diupload
       const htmlText = await file.text();
 
-      // 3. Deploy
+      // 3. Kirim Deployment ke Vercel
       const deployRes = await fetch("https://api.vercel.com/v13/deployments", {
         method: "POST",
         headers: { "Authorization": `Bearer ${vercelToken}`, "Content-Type": "application/json" },
@@ -174,20 +179,23 @@
 
       const data = await deployRes.json();
 
-      if (data.url || data.readyState) {
+      if (data.url || data.id) {
+        // Berhasil
         resUrl.innerText = `https://${siteName}.vercel.app`;
         resBox.style.display = "flex";
-        btn.innerHTML = `<i class="fa-solid fa-check"></i> Berhasil!`;
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai!`;
+        alert("Website Anda berhasil dideploy!");
       } else {
-        throw new Error(data.error?.message || "Terjadi kesalahan");
+        throw new Error(data.error?.message || "Gagal menghubungi Vercel.");
       }
     } catch (err) {
-      alert("Gagal Deploy: " + err.message);
+      alert("Error: " + err.message);
       btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Coba Lagi`;
       btn.disabled = false;
     }
   });
 
+  // FUNGSI COPY
   function copyLink() {
     const url = document.getElementById("resultUrl").innerText;
     navigator.clipboard.writeText(url);
