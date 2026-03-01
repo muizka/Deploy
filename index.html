@@ -24,7 +24,7 @@
     }
 
     .card-wrapper { width: 95%; max-width: 420px; padding: 1px; border-radius: 24px; background: linear-gradient(135deg, rgba(255,255,255,0.1), var(--accent-color), #000); }
-    .main-card { background: var(--card-inner); border-radius: 23px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .main-card { background: var(--card-inner); border-radius: 23px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
 
     .header { text-align: center; margin-bottom: 25px; }
     .header h2 { margin: 0; font-size: 24px; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -83,7 +83,7 @@
     <form id="deployForm">
       <div class="input-box">
         <i class="fa-solid fa-globe"></i>
-        <input type="text" id="siteName" placeholder="Nama Website (contoh: muiz-web)" required>
+        <input type="text" id="siteName" placeholder="Nama Website (cth: muiz-web)" required>
       </div>
       <div class="input-box">
         <i class="fa-solid fa-file-code"></i>
@@ -96,7 +96,7 @@
     </form>
 
     <div id="resultBox" class="result-box">
-      <div id="resultUrl" class="result-url">Menunggu URL...</div>
+      <div id="resultUrl" class="result-url"></div>
       <button onclick="copyLink()" class="task-btn" style="background:#333; color:white;">
         <i class="fa-regular fa-copy"></i> Salin Link
       </button>
@@ -105,14 +105,12 @@
 </div>
 
 <script>
-  // --- KONFIGURASI UTAMA ---
+  // --- KODE CONFIG MURNI DARI MUIZ ---
   const VALID_KEY = "MUIZ-2026"; 
-  // PENTING: Masukkan Access Token (bukan vcp_...) yang Anda dapat dari Vercel Settings > Tokens
-  const vercelToken = "PASTE_TOKEN_ANDA_DI_SINI"; 
+  const vercelToken = "vcp_6r9VRLQa2hcKuPUC7b1HoHexH0IvGCZBTxhw0UkvIgwowYBrPN2BpqlU"; 
 
   let taskDone = { ig: false, tk: false };
 
-  // FUNGSI TUGAS
   function doTask(element, type, url) {
     window.open(url, '_blank');
     setTimeout(() => {
@@ -120,10 +118,9 @@
       element.classList.add('done');
       element.innerHTML = `<i class="fa-solid fa-check"></i> Selesai`;
       validateAll();
-    }, 3000); // 3 detik verifikasi
+    }, 2500);
   }
 
-  // FUNGSI VALIDASI
   function validateAll() {
     const keyInput = document.getElementById('licenseKey').value.trim();
     const btn = document.getElementById('deployBtn');
@@ -139,7 +136,6 @@
     }
   }
 
-  // LOGIKA DEPLOY KE VERCEL
   document.getElementById("deployForm").addEventListener("submit", async function(e) {
     e.preventDefault();
     const btn = document.getElementById("deployBtn");
@@ -149,24 +145,20 @@
     const siteName = document.getElementById("siteName").value.trim().toLowerCase().replace(/[^a-z0-9]/g, '-');
     const file = document.getElementById("htmlFile").files[0];
 
-    if (!file) return alert("Silakan pilih file HTML!");
-    if (vercelToken === "PASTE_TOKEN_ANDA_DI_SINI") return alert("Token belum diatur di dalam kode!");
-
-    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sedang Deploy...`;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses...`;
     btn.disabled = true;
 
     try {
-      // 1. Buat Project Baru di Vercel
+      // Step 1: Create Project
       await fetch("https://api.vercel.com/v9/projects", {
         method: "POST",
         headers: { "Authorization": `Bearer ${vercelToken}`, "Content-Type": "application/json" },
         body: JSON.stringify({ name: siteName })
       });
 
-      // 2. Baca isi file HTML yang diupload
       const htmlText = await file.text();
 
-      // 3. Kirim Deployment ke Vercel
+      // Step 2: Deployment
       const deployRes = await fetch("https://api.vercel.com/v13/deployments", {
         method: "POST",
         headers: { "Authorization": `Bearer ${vercelToken}`, "Content-Type": "application/json" },
@@ -180,26 +172,24 @@
       const data = await deployRes.json();
 
       if (data.url || data.id) {
-        // Berhasil
         resUrl.innerText = `https://${siteName}.vercel.app`;
         resBox.style.display = "flex";
-        btn.innerHTML = `<i class="fa-solid fa-check"></i> Selesai!`;
-        alert("Website Anda berhasil dideploy!");
+        btn.innerHTML = `<i class="fa-solid fa-check"></i> Berhasil!`;
+        alert("Website Baru Berhasil Online!");
       } else {
-        throw new Error(data.error?.message || "Gagal menghubungi Vercel.");
+        throw new Error(data.error?.message || "Gagal Deploy");
       }
     } catch (err) {
-      alert("Error: " + err.message);
+      alert("Pesan Vercel: " + err.message);
       btn.innerHTML = `<i class="fa-solid fa-bolt"></i> Coba Lagi`;
       btn.disabled = false;
     }
   });
 
-  // FUNGSI COPY
   function copyLink() {
     const url = document.getElementById("resultUrl").innerText;
     navigator.clipboard.writeText(url);
-    alert("Link berhasil disalin!");
+    alert("Link disalin!");
   }
 </script>
 
